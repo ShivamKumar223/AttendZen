@@ -12,7 +12,7 @@ router.get("/", showStudentDashboard);
 router.post("/joinRequest", sendJoinRequest);
 
 // To check attendance details
-router.get("/attendanceDetails", showAttendanceDetails);
+router.get("/attendanceDetails/:classId/:userId", showAttendanceDetails);
 
 
 export default router;

@@ -8,10 +8,11 @@ const teacherSchema = new mongoose.Schema({
     },
 
     classes : {
-        type : [Number],
+        type : [String],
         default : []
     },
 
 });
 
-module.exports = mongoose.model("teacher", teacherSchema);
+const Teachers = mongoose.model("teacher", teacherSchema);
+export default Teachers;

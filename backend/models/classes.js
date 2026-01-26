@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const classSchema = new mongoose.Schema({
     classId: {
-        type : Number,
+        type : String,
         required : true,
         unique : true
     },
@@ -31,4 +31,5 @@ const classSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model("class", classSchema);
+const Classes = mongoose.model("class", classSchema);
+export default Classes;

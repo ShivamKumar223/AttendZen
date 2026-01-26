@@ -8,10 +8,12 @@ const studentSchema = new mongoose.Schema({
     },
      
     enroledIn : {
-        type : [Number],
-        unique : true,
+        type : [String],
+        unique: false,
         default : []
     }
 });
 
-module.exports = mongoose.model("student", studentSchema);
+const Students = mongoose.model("student", studentSchema);
+ 
+export default Students;

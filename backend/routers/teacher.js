@@ -2,7 +2,7 @@ import express from "express";
 
 // import controller means all functiions
 import {showTeacherDashboard, createNewClass, updateClassDetails, deleteClass, markAttendance,
-    retriveDetails, retriveStudentsAtDate, retriveAllStudensts, 
+    retriveAttendanceDetails, retriveStudentsAtDate, retriveAllStudensts, 
     updateAttendance, removeStudentFromClass
 } from "../controllers/teacher.js";
 
@@ -15,27 +15,33 @@ router.get("/", showTeacherDashboard)
 router.post("/createNewClass", createNewClass);
 
 // To update class detail
-router.patch("/update/:class", updateClassDetails);
+router.patch("/update/:classId", updateClassDetails);
 
 // To delete class 
-router.delete("/delete/:class", deleteClass)
+router.delete("/delete/:classId", deleteClass)
+
+// Retrive all students in a particular class
+router.get("/studentsInClass/:classId", retriveAllStudensts);
 
 // To mark attendance
-router.post("/markAttendance", markAttendance);
+router.patch("/markAttendance", markAttendance);
 
 // To retrive attendance details for a particular student
-router.get("/attendanceDetails/:rollOrName", retriveDetails);
+router.get("/attendanceDetails/:classId/:userId", retriveAttendanceDetails);
+
+// To remove student from class
+router.delete("/remove/:classId/:userId", removeStudentFromClass);
+
+
+
+
+// Pending : 
 
 // To retrive all students which present at particular date
 router.get("/studentsAtDate/:date", retriveStudentsAtDate);
 
-// Retrive all students in a particular class
-router.get("/studentsInClass/:class", retriveAllStudensts);
-
 // To update/edit attendance
 router.patch("/updateAttendance", updateAttendance);
 
-// To remove student from class
-router.delete("/remove/:student", removeStudentFromClass);
 
 export default router;
