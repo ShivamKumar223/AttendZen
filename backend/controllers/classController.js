@@ -7,9 +7,9 @@ import crypto from "crypto";
 export const createClass = async (req, res) => {
   try {
     const { className, subject } = req.body;
-    
+
     // Generate a unique short code
-    const classCode = crypto.randomBytes(3).toString("hex").toUpperCase(); 
+    const classCode = crypto.randomBytes(3).toString("hex").toUpperCase();
 
     const newClass = await Class.create({
       className,

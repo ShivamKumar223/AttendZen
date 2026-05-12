@@ -18,7 +18,7 @@ export const notifyAttendance = async (req, res) => {
       const msg = record.status === "present"
         ? `You are present in class ${classDoc.className}`
         : `You are not present in class ${classDoc.className}`;
-      
+
       req.io.to(record.studentId.toString()).emit("attendance-notification", {
         message: msg,
         classId,
@@ -47,7 +47,7 @@ export const submitAttendance = async (req, res) => {
     }));
 
     // Upsert attendance for that date
-    let attendance = await Attendance.findOne({ class: classId, date: new Date(date).setHours(0,0,0,0) });
+    let attendance = await Attendance.findOne({ class: classId, date: new Date(date).setHours(0, 0, 0, 0) });
 
     if (attendance) {
       attendance.records = formattedRecords;
@@ -56,7 +56,7 @@ export const submitAttendance = async (req, res) => {
     } else {
       attendance = await Attendance.create({
         class: classId,
-        date: new Date(date).setHours(0,0,0,0),
+        date: new Date(date).setHours(0, 0, 0, 0),
         records: formattedRecords,
         isFinalized: true
       });
@@ -67,7 +67,7 @@ export const submitAttendance = async (req, res) => {
       const msg = record.status === "present"
         ? `Attendance Submitted: You are present in class ${classDoc.className}`
         : `Attendance Submitted: You are not present in class ${classDoc.className}`;
-      
+
       req.io.to(record.studentId.toString()).emit("attendance-notification", {
         message: msg,
         classId,
