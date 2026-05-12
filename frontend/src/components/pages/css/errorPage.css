@@ -1,0 +1,22 @@
+.error-page{
+    max-width: 100vw;
+    min-height: 100vh;
+
+     display: flex;
+     align-items: center;
+     justify-content: center;
+}
+
+.error-section{
+   
+    display: flex;
+    flex-direction: column;
+    gap:3rem;
+
+    height: 31rem;
+    min-width: 15rem;
+    width: 25rem;
+    padding: 1rem;
+    margin-left: 5%;
+    margin-right: 5%;
+}

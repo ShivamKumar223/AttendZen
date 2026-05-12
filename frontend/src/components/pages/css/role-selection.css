@@ -1,0 +1,79 @@
+.Role-Selection{
+    height: 90vh;
+    width: 100wh;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.role{
+   background-color: #FFFFFF;
+
+    height: 31rem;
+    min-width: 15rem;
+    width: 25rem;
+    padding: 1rem;
+    margin: 5%;
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:1.8rem;
+
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 1rem;
+}
+
+.role div{
+    border: 2px solid black;
+    width: 80%;
+    height: 2.5rem;
+    border-radius: 3rem;
+    padding:5px;
+    padding-left: 1.5rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.role button{
+     height: 2.5rem;
+    width: 30%;
+    min-width: 7rem;
+    border-radius: 3rem;
+    margin-right: 0.25rem;
+    justify-self:end;
+}
+
+@media (max-width: 700px) {
+    .Role-Selection{
+        
+        height: 90vh;
+        width: 100wh;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+
+    .role{
+      width: 70%;
+    }
+
+    .role img{
+    max-width: 75%;
+    }
+    .role div{
+        height: 25%;
+        font-size: 12px;
+
+        padding: 1px;
+        padding-left: 10px;
+        justify-content: space-between;
+        
+    }
+    
+}
