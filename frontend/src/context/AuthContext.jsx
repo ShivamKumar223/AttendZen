@@ -9,7 +9,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Axios defaults
-  axios.defaults.baseURL = 'http://localhost:7000/api';
+  // axios.defaults.baseURL = 'http://localhost:7000/api';
+  axios.defaults.baseURL = 'https://attendzen.onrender.com';
 
   useEffect(() => {
     if (token) {
