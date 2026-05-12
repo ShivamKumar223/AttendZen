@@ -58,10 +58,10 @@ app.use((req, res, next) => {
 });
 
 // API Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/classes", classRoutes);
-app.use("/api/requests", requestRoutes);
-app.use("/api/attendance", attendanceRoutes);
+app.use("https://attendzen.onrender.com/api/auth", authRoutes);
+app.use("https://attendzen.onrender.com/api/classes", classRoutes);
+app.use("https://attendzen.onrender.com/api/requests", requestRoutes);
+app.use("https://attendzen.onrender.com/api/attendance", attendanceRoutes);
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
