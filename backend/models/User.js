@@ -5,31 +5,28 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
-
     email: {
       type: String,
       required: true,
-     unique: true,
+      unique: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
     },
-
+    mobile: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     password: {
       type: String,
       required: true,
-      minlength: 6
+      minlength: 6,
     },
-
-    userId: {
-      type: String,
-      required: true,
-      unique: true
-    }
   },
   { timestamps: true }
 );
 
-const Users = mongoose.model("User", userSchema);
-export default Users;
+const User = mongoose.model("User", userSchema);
+export default User;
