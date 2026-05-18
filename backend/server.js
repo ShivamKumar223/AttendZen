@@ -12,6 +12,7 @@ import authRoutes from "./routers/authRoutes.js";
 import classRoutes from "./routers/classRoutes.js";
 import requestRoutes from "./routers/requestRoutes.js";
 import attendanceRoutes from "./routers/attendanceRoutes.js";
+import notificationRoutes from "./routers/notificationRoutes.js";
 
 dotenv.config();
 DBconnection(); // 🔥 Atlas connection
@@ -62,6 +63,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {

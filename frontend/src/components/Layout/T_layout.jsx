@@ -1,4 +1,4 @@
-import { T_header } from "../components/t_header";
+import { T_header } from "../components/T_header";
 import { Outlet } from "react-router-dom";
 
 
@@ -6,8 +6,8 @@ import { Outlet } from "react-router-dom";
 export const T_layout = () => {
   return (
     <div>
-        <T_header />
-        <Outlet />
+      <T_header />
+      <Outlet />
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import axios from 'axios';
 import { AuthContext } from './AuthContext';
 import { SocketContext } from './SocketContext';
 
@@ -51,12 +52,23 @@ export const NotificationProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const idRef = useRef(0);
 
-  const addNotification = useCallback((message, type = 'info') => {
-    const id = ++idRef.current;
+  const fetchNotifications = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await axios.get('/notifications');
+      setNotifications(res.data);
+      setUnreadCount(res.data.length); // simple unread count based on total for now
+    } catch (error) {
+      console.error(error);
+    }
+  }, [user]);
 
-    // Add to persistent notification list
-    setNotifications(prev => [{ id, message, type, time: new Date() }, ...prev]);
-    setUnreadCount(prev => prev + 1);
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  const addToast = useCallback((message, type = 'info') => {
+    const id = ++idRef.current;
 
     // Add toast (auto-removes after 4.5 s)
     setToasts(prev => [{ id, message, type }, ...prev]);
@@ -66,7 +78,13 @@ export const NotificationProvider = ({ children }) => {
 
     // Play tone
     playTone(type);
-  }, []);
+
+    // Also fetch the newly created notification from DB
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  // Keep for backwards compatibility if needed, but mainly use addToast
+  const addNotification = addToast;
 
   const removeToast = useCallback((id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
@@ -76,7 +94,19 @@ export const NotificationProvider = ({ children }) => {
     setUnreadCount(0);
   }, []);
 
-  const clearAll = useCallback(() => {
+  const deleteNotification = useCallback(async (id) => {
+    try {
+      await axios.delete(`/notifications/${id}`);
+      setNotifications(prev => prev.filter(n => n._id !== id));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const clearAll = useCallback(async () => {
+    // We could add a clearAll API, but for now just clear local state 
+    // or iterate and delete. Let's just do local for now.
     setNotifications([]);
     setUnreadCount(0);
   }, []);
@@ -86,23 +116,23 @@ export const NotificationProvider = ({ children }) => {
     if (!socket) return;
 
     const onJoinRequest = (data) => addNotification(data.message, 'info');
-    const onResponse    = (data) => addNotification(data.message, data.status === 'accepted' ? 'success' : 'error');
-    const onAttendance  = (data) => addNotification(data.message, 'info');
+    const onResponse = (data) => addNotification(data.message, data.status === 'accepted' ? 'success' : 'error');
+    const onAttendance = (data) => addNotification(data.message, 'info');
 
-    socket.on('new-join-request',       onJoinRequest);
-    socket.on('request-response',       onResponse);
+    socket.on('new-join-request', onJoinRequest);
+    socket.on('request-response', onResponse);
     socket.on('attendance-notification', onAttendance);
 
     return () => {
-      socket.off('new-join-request',       onJoinRequest);
-      socket.off('request-response',       onResponse);
+      socket.off('new-join-request', onJoinRequest);
+      socket.off('request-response', onResponse);
       socket.off('attendance-notification', onAttendance);
     };
   }, [socket, addNotification]);
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, toasts, unreadCount, addNotification, removeToast, markAllRead, clearAll }}
+      value={{ notifications, toasts, unreadCount, addNotification, removeToast, markAllRead, clearAll, deleteNotification }}
     >
       {children}
     </NotificationContext.Provider>

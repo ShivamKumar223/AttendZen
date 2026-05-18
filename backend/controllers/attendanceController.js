@@ -1,6 +1,7 @@
 import Attendance from "../models/Attendance.js";
 import Class from "../models/Class.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 // @desc    Notify students about attendance (Confirm step)
 // @route   POST /api/attendance/notify
@@ -19,6 +20,7 @@ export const notifyAttendance = async (req, res) => {
         ? `You are present in class ${classDoc.className}`
         : `You are not present in class ${classDoc.className}`;
 
+      await Notification.create({ user: record.studentId, message: msg, type: "info" });
       req.io.to(record.studentId.toString()).emit("attendance-notification", {
         message: msg,
         classId,
@@ -68,6 +70,7 @@ export const submitAttendance = async (req, res) => {
         ? `Attendance Submitted: You are present in class ${classDoc.className}`
         : `Attendance Submitted: You are not present in class ${classDoc.className}`;
 
+      await Notification.create({ user: record.studentId, message: msg, type: record.status === "present" ? "success" : "info" });
       req.io.to(record.studentId.toString()).emit("attendance-notification", {
         message: msg,
         classId,

@@ -1,12 +1,13 @@
 import JoinRequest from "../models/JoinRequest.js";
 import Class from "../models/Class.js";
+import Notification from "../models/Notification.js";
 
 // @desc    Send a join request to a class
 // @route   POST /api/requests
 // @access  Private
 export const sendJoinRequest = async (req, res) => {
   try {
-    const { classId } = req.body; // Actually class Code from client
+    const { classId, rollNo } = req.body; // Actually class Code from client
 
     const foundClass = await Class.findOne({ classCode: classId });
     if (!foundClass) return res.status(404).json({ message: "Class not found" });
@@ -20,18 +21,21 @@ export const sendJoinRequest = async (req, res) => {
     const existingRequest = await JoinRequest.findOne({ student: req.user.id, class: foundClass._id });
     if (existingRequest) return res.status(400).json({ message: "Request already sent" });
 
-    if (foundClass.students.includes(req.user.id)) {
+    if (foundClass.students.some(s => s.student.toString() === req.user.id)) {
       return res.status(400).json({ message: "Already enrolled in class" });
     }
 
     const request = await JoinRequest.create({
       student: req.user.id,
       class: foundClass._id,
+      rollNo,
     });
 
-    // Notify teacher via Socket.IO
+    // Notify teacher via Socket.IO & DB
+    const message = `${req.user.name} has requested to join ${foundClass.className}`;
+    await Notification.create({ user: foundClass.teacher, message, type: "info" });
     req.io.to(foundClass.teacher.toString()).emit("new-join-request", {
-      message: `${req.user.name} has requested to join ${foundClass.className}`,
+      message,
       classId: foundClass._id,
     });
 
@@ -70,13 +74,15 @@ export const respondToRequest = async (req, res) => {
 
     if (status === "accepted") {
       const classDoc = await Class.findById(request.class._id);
-      classDoc.students.push(request.student);
+      classDoc.students.push({ student: request.student, rollNo: request.rollNo });
       await classDoc.save();
     }
 
-    // Notify student via Socket.IO
+    // Notify student via Socket.IO & DB
+    const message = `Your request to join ${request.class.className} was ${status}`;
+    await Notification.create({ user: request.student, message, type: status === "accepted" ? "success" : "error" });
     req.io.to(request.student.toString()).emit("request-response", {
-      message: `Your request to join ${request.class.className} was ${status}`,
+      message,
       status,
       classId: request.class._id,
     });

@@ -9,7 +9,7 @@ const getInitials = (name = '') =>
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
-  const { notifications, unreadCount, markAllRead, clearAll } = useContext(NotificationContext);
+  const { notifications, unreadCount, markAllRead, clearAll, deleteNotification } = useContext(NotificationContext);
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -84,9 +84,18 @@ const Navbar = () => {
                   <div className="notif-empty">🔔 No notifications yet</div>
                 ) : (
                   notifications.slice(0, 20).map(n => (
-                    <div key={n.id} className="notif-item">
-                      <div>{n.message}</div>
-                      <div style={{ fontSize: '0.72rem', color: 'rgba(148,163,184,0.5)', marginTop: '0.25rem' }}>{timeLabel(n.time)}</div>
+                    <div key={n._id} className="notif-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <div>{n.message}</div>
+                        <div style={{ fontSize: '0.72rem', color: 'rgba(148,163,184,0.5)', marginTop: '0.25rem' }}>{timeLabel(n.createdAt)}</div>
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); deleteNotification(n._id); }}
+                        style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                        title="Delete Notification"
+                      >
+                        <FiTrash2 size={14} />
+                      </button>
                     </div>
                   ))
                 )}

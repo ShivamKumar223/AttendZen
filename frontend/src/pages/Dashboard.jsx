@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [className, setClassName] = useState('');
   const [subject, setSubject] = useState('');
   const [joinCode, setJoinCode] = useState('');
+  const [rollNo, setRollNo] = useState('');
   const [loading, setLoading] = useState(false);
 
   const fetchClasses = async () => {
@@ -70,10 +71,11 @@ const Dashboard = () => {
     setLoading(true);
 
     try {
-      await axios.post('/requests', { classId: joinCode });
+      await axios.post('/requests', { classId: joinCode, rollNo });
 
       setShowJoinClass(false);
       setJoinCode('');
+      setRollNo('');
 
       addNotification(
         'Join request sent! Wait for the teacher to accept.',
@@ -128,7 +130,7 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-res">
               <button
                 className="btn btn-secondary"
                 onClick={() => setShowJoinClass(true)}
@@ -180,8 +182,8 @@ const Dashboard = () => {
         >
           <button
             className={`btn ${activeSection === 'teaching'
-                ? 'btn-primary'
-                : 'btn-secondary'
+              ? 'btn-primary'
+              : 'btn-secondary'
               }`}
             onClick={() => setActiveSection('teaching')}
           >
@@ -190,8 +192,8 @@ const Dashboard = () => {
 
           <button
             className={`btn ${activeSection === 'enrolled'
-                ? 'btn-primary'
-                : 'btn-secondary'
+              ? 'btn-primary'
+              : 'btn-secondary'
               }`}
             onClick={() => setActiveSection('enrolled')}
           >
@@ -291,8 +293,20 @@ const Dashboard = () => {
                     required
                     style={{
                       letterSpacing: '0.15em',
-                      fontWeight: 700,
                     }}
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginTop: '1rem' }}>
+                  <label className="form-label">Roll Number</label>
+
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="e.g. 101"
+                    value={rollNo}
+                    onChange={(e) => setRollNo(e.target.value)}
+                    required
                   />
                 </div>
 

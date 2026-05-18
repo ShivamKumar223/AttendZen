@@ -9,7 +9,7 @@ import { FiArrowLeft, FiCheck, FiX, FiUsers, FiCalendar, FiClock } from 'react-i
 const getInitials = (name = '') =>
   name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
-const TABS = ['Requests', 'Attendance', 'History'];
+const TABS = ['Requests', 'Enrolled', 'Attendance', 'History'];
 
 const ClassDetail = () => {
   const { id } = useParams();
@@ -33,7 +33,7 @@ const ClassDetail = () => {
       fetchRequests();
       fetchAttendanceHistory();
       const initial = {};
-      classData.students.forEach(s => { initial[s._id] = null; });
+      classData.students.forEach(s => { initial[s.student._id] = null; });
       setAttendanceState(initial);
     } else {
       fetchStudentAttendance();
@@ -50,15 +50,15 @@ const ClassDetail = () => {
   };
 
   const fetchRequests = async () => {
-    try { const res = await axios.get(`/requests/${id}`); setRequests(res.data); } catch (err) {}
+    try { const res = await axios.get(`/requests/${id}`); setRequests(res.data); } catch (err) { }
   };
 
   const fetchAttendanceHistory = async () => {
-    try { const res = await axios.get(`/attendance/class/${id}`); setAttendanceRecords(res.data); } catch (err) {}
+    try { const res = await axios.get(`/attendance/class/${id}`); setAttendanceRecords(res.data); } catch (err) { }
   };
 
   const fetchStudentAttendance = async () => {
-    try { const res = await axios.get(`/attendance/student/${id}`); setStudentAttendance(res.data); } catch (err) {}
+    try { const res = await axios.get(`/attendance/student/${id}`); setStudentAttendance(res.data); } catch (err) { }
   };
 
   const handleRequestResponse = async (reqId, status) => {
@@ -67,6 +67,15 @@ const ClassDetail = () => {
       fetchRequests(); fetchClassDetails();
       addNotification(`Request ${status} successfully.`, status === 'accepted' ? 'success' : 'error');
     } catch (err) { addNotification('Error updating request', 'error'); }
+  };
+
+  const handleRemoveStudent = async (studentId) => {
+    if (!window.confirm("Are you sure you want to remove this student?")) return;
+    try {
+      await axios.delete(`/classes/${id}/students/${studentId}`);
+      addNotification('Student removed successfully.', 'success');
+      fetchClassDetails();
+    } catch (err) { addNotification('Error removing student', 'error'); }
   };
 
   const handleAttendanceChange = (studentId, status) => {
@@ -189,7 +198,7 @@ const ClassDetail = () => {
                           </div>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{req.student.name}</div>
-                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{req.student.email}</div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{req.student.email} &bull; Roll: {req.rollNo}</div>
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -202,6 +211,77 @@ const ClassDetail = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Tab: Enrolled ── */}
+            {activeTab === 'Enrolled' && (
+              <div className="glass-panel card fade-in-up">
+                <h3 style={{ marginBottom: '1.25rem' }}>Enrolled Students</h3>
+                {classData.students.length === 0 ? (
+                  <div className="empty-state" style={{ padding: '2rem' }}>
+                    <div className="empty-state-icon">🎒</div>
+                    <p>No students enrolled yet.</p>
+                  </div>
+                ) : (
+                  <div className="table-container">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Student</th>
+                          <th>Roll No</th>
+                          <th>Attendance</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {classData.students.map(s => {
+                          let present = 0;
+                          let total = attendanceRecords.length;
+                          attendanceRecords.forEach(record => {
+                            const r = record.records.find(rc => rc.student && rc.student._id === s.student._id);
+                            if (r && r.status === 'present') present++;
+                          });
+                          const rate = total ? Math.round((present / total) * 100) : 0;
+
+                          return (
+                            <tr key={s.student._id}>
+                              <td>
+                                <div className="flex items-center gap-3">
+                                  <div className="avatar" style={{ width: '30px', height: '30px', fontSize: '0.7rem' }}>
+                                    {getInitials(s.student.name)}
+                                  </div>
+                                  <div>
+                                    <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{s.student.name}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.student.email}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td style={{ fontWeight: 600 }}>{s.rollNo || '-'}</td>
+                              <td>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                  <div style={{ flex: 1, height: '6px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)' }}>
+                                    <div style={{ width: `${rate}%`, height: '100%', borderRadius: '999px', background: rate >= 75 ? 'var(--success)' : rate >= 50 ? 'var(--warning)' : 'var(--danger)' }} />
+                                  </div>
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', minWidth: '34px' }}>{rate}%</span>
+                                </div>
+                              </td>
+                              <td>
+                                <button
+                                  className="btn btn-ghost"
+                                  style={{ color: 'var(--danger)', padding: '0.3rem', fontSize: '0.8rem' }}
+                                  onClick={() => handleRemoveStudent(s.student._id)}
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </div>
@@ -222,25 +302,25 @@ const ClassDetail = () => {
                 ) : (
                   <>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                      {classData.students.map(student => (
-                        <div key={student._id} className="flex items-center justify-between" style={{ padding: '0.8rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                      {classData.students.map(s => (
+                        <div key={s.student._id} className="flex items-center justify-between" style={{ padding: '0.8rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)' }}>
                           <div className="flex items-center gap-3">
                             <div className="avatar" style={{ width: '32px', height: '32px', fontSize: '0.72rem' }}>
-                              {getInitials(student.name)}
+                              {getInitials(s.student.name)}
                             </div>
                             <div>
-                              <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{student.name}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{student.email}</div>
+                              <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{s.student.name}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Roll: {s.rollNo}</div>
                             </div>
                           </div>
                           <div className="att-toggle-group">
                             <button
-                              className={`att-pill present ${attendanceState[student._id] === 'present' ? 'active' : ''}`}
-                              onClick={() => handleAttendanceChange(student._id, 'present')}
+                              className={`att-pill present ${attendanceState[s.student._id] === 'present' ? 'active' : ''}`}
+                              onClick={() => handleAttendanceChange(s.student._id, 'present')}
                             >✓ Present</button>
                             <button
-                              className={`att-pill absent ${attendanceState[student._id] === 'absent' ? 'active' : ''}`}
-                              onClick={() => handleAttendanceChange(student._id, 'absent')}
+                              className={`att-pill absent ${attendanceState[s.student._id] === 'absent' ? 'active' : ''}`}
+                              onClick={() => handleAttendanceChange(s.student._id, 'absent')}
                             >✗ Absent</button>
                           </div>
                         </div>
@@ -283,7 +363,7 @@ const ClassDetail = () => {
                       <tbody>
                         {attendanceRecords.map(record => {
                           const presentCount = record.records.filter(r => r.status === 'present').length;
-                          const absentCount  = record.records.filter(r => r.status === 'absent').length;
+                          const absentCount = record.records.filter(r => r.status === 'absent').length;
                           const rate = record.records.length ? Math.round((presentCount / record.records.length) * 100) : 0;
                           return (
                             <tr key={record._id}>

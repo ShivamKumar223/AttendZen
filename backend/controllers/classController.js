@@ -31,13 +31,37 @@ export const getUserClasses = async (req, res) => {
   try {
     const teachingClasses = await Class.find({ teacher: req.user.id })
       .populate("teacher", "name email")
-      .populate("students", "name rollNo"); // We don't have rollNo in User, but we can just use name for now
+      .populate("students.student", "name email");
 
-    const enrolledClasses = await Class.find({ students: req.user.id })
+    const enrolledClasses = await Class.find({ "students.student": req.user.id })
       .populate("teacher", "name email")
-      .populate("students", "name email");
+      .populate("students.student", "name email");
 
     res.json({ teaching: teachingClasses, enrolled: enrolledClasses });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Remove a student from a class
+// @route   DELETE /api/classes/:classId/students/:studentId
+// @access  Private
+export const removeStudent = async (req, res) => {
+  try {
+    const { classId, studentId } = req.params;
+    const classDoc = await Class.findById(classId);
+
+    if (!classDoc) return res.status(404).json({ message: "Class not found" });
+
+    // Only the teacher can remove students
+    if (classDoc.teacher.toString() !== req.user.id) {
+      return res.status(401).json({ message: "Not authorized to remove students" });
+    }
+
+    classDoc.students = classDoc.students.filter(s => s.student.toString() !== studentId);
+    await classDoc.save();
+
+    res.json({ message: "Student removed from class" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -25,31 +25,31 @@ const Login = () => {
       <div className="glass-panel card" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="heading-gradient mb-4 text-center">Welcome Back</h2>
         {error && <div className="badge badge-danger mb-4" style={{ display: 'block', textAlign: 'center' }}>{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Email Address</label>
-            <input 
-              type="email" 
-              className="form-control" 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input 
-              type="password" 
-              className="form-control" 
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-              required 
+            <input
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
             />
           </div>
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Login</button>
         </form>
-        
+
         <p className="text-center mt-4 text-muted">
           Don't have an account? <Link to="/signup" style={{ color: 'var(--primary)' }}>Sign Up</Link>
         </p>

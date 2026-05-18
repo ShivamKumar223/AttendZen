@@ -562,7 +562,7 @@ p {
 .notif-dropdown {
   position: absolute;
   top: 52px;
-  right: 0;
+  right: -9rem;
   width: 320px;
   max-height: 420px;
   overflow-y: auto;
@@ -732,6 +732,13 @@ p {
 /* ── Utilities ──────────────────────────────────────────────────────────────── */
 .flex {
   display: flex;
+}
+
+@media (max-width: 415px) {
+  .flex-res {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .flex-col {

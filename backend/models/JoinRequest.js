@@ -12,6 +12,11 @@ const joinRequestSchema = new mongoose.Schema(
       ref: "Class",
       required: true,
     },
+    rollNo: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],

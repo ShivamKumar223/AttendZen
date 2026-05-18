@@ -24,8 +24,13 @@ const classSchema = new mongoose.Schema(
     },
     students: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        student: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        rollNo: {
+          type: String,
+        },
       },
     ],
   },

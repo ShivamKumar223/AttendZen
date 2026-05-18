@@ -1,4 +1,4 @@
-.navbar0{
+.navbar0 {
     height: 4rem;
     max-width: 100vw;
     background-color: #2563EB;
@@ -9,13 +9,14 @@
 
 }
 
-.logo, .login{
+.logo,
+.login {
     width: 30%;
     line-height: 1.5;
     text-align: center;
 }
 
-.navbar0 ul{
+.navbar0 ul {
     width: 35%;
     display: flex;
     justify-content: space-evenly;
@@ -25,10 +26,10 @@
 
 /* footer css */
 
-.footer0{
+.footer0 {
     max-width: 100vw;
     min-height: 20rem;
-    
+
     display: flex;
     justify-content: center;
     align-items: center;

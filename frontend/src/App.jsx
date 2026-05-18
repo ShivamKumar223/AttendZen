@@ -30,12 +30,12 @@ function AppContent() {
     <>
       <div className={user ? 'main-content' : ''}>
         <Routes>
-          <Route path="/"           element={<Navigate to={user ? '/dashboard' : '/login'} />} />
-          <Route path="/login"      element={<Login />} />
-          <Route path="/signup"     element={<Signup />} />
-          <Route path="/dashboard"  element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/class/:id"  element={<PrivateRoute><ClassDetail /></PrivateRoute>} />
-          <Route path="*"           element={<Navigate to="/" />} />
+          <Route path="/" element={<Navigate to={user ? '/dashboard' : '/login'} />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/class/:id" element={<PrivateRoute><ClassDetail /></PrivateRoute>} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
       {/* Global toast container — sits above everything */}

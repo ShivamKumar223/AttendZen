@@ -3,21 +3,21 @@ import { NotificationContext } from '../context/NotificationContext';
 import { FiBell, FiCheckCircle, FiXCircle, FiX } from 'react-icons/fi';
 
 const icons = {
-  info:    <FiBell size={18} />,
+  info: <FiBell size={18} />,
   success: <FiCheckCircle size={18} />,
-  error:   <FiXCircle size={18} />,
+  error: <FiXCircle size={18} />,
 };
 
 const colours = {
-  info:    'var(--primary)',
+  info: 'var(--primary)',
   success: 'var(--success)',
-  error:   'var(--danger)',
+  error: 'var(--danger)',
 };
 
 const bgColours = {
-  info:    'rgba(99,102,241,0.15)',
+  info: 'rgba(99,102,241,0.15)',
   success: 'rgba(16,185,129,0.15)',
-  error:   'rgba(239,68,68,0.15)',
+  error: 'rgba(239,68,68,0.15)',
 };
 
 const NotificationToast = () => {
