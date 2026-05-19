@@ -58,10 +58,6 @@ app.use((req, res, next) => {
   next();
 });
 
-import path from "path";
-
-const __dirname = path.resolve();
-
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/classes", classRoutes);
@@ -69,20 +65,7 @@ app.use("/api/requests", requestRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Serve frontend in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"))
-  );
-} else {
-  app.get("/", (req, res) => {
-    res.send("API is running...");
-  });
-}
-
 const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, "0.0.0.0", () => {
+httpServer.listen(PORT, z() => {
   console.log(`Server running on port ${PORT}`);
 });
