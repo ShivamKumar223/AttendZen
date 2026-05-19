@@ -24,6 +24,7 @@ const ClassDetail = () => {
   const [attendanceState, setAttendanceState] = useState({});
   const [isConfirming, setIsConfirming] = useState(false);
   const [activeTab, setActiveTab] = useState('Requests');
+  const [selectedStudentForModal, setSelectedStudentForModal] = useState(null);
 
   useEffect(() => { fetchClassDetails(); }, [id]);
 
@@ -191,7 +192,7 @@ const ClassDetail = () => {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {requests.map(req => (
-                      <div key={req._id} className="flex items-center justify-between" style={{ padding: '0.85rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                      <div key={req._id} className="flex-res flex items-center justify-between" style={{ padding: '0.85rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)' }}>
                         <div className="flex items-center gap-3">
                           <div className="avatar" style={{ width: '34px', height: '34px', fontSize: '0.75rem' }}>
                             {getInitials(req.student.name)}
@@ -248,7 +249,10 @@ const ClassDetail = () => {
 
                           return (
                             <tr key={s.student._id}>
-                              <td>
+                              <td
+                                onClick={() => setSelectedStudentForModal({ ...s.student, rollNo: s.rollNo, rate, present, total: attendanceRecords.length })}
+                                style={{ cursor: 'pointer' }}
+                              >
                                 <div className="flex items-center gap-3">
                                   <div className="avatar" style={{ width: '30px', height: '30px', fontSize: '0.7rem' }}>
                                     {getInitials(s.student.name)}
@@ -442,6 +446,88 @@ const ClassDetail = () => {
           </div>
         )}
       </div>
+
+      {/* ── STUDENT DETAIL MODAL ─────────────────────────────────────── */}
+      {selectedStudentForModal && (
+        <div
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+            padding: '1rem'
+          }}
+          onClick={() => setSelectedStudentForModal(null)}
+        >
+          <div
+            className="glass-panel card fade-in-up"
+            style={{ width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between" style={{ marginBottom: '1.25rem' }}>
+              <div className="flex items-center gap-3">
+                <div className="avatar" style={{ width: '40px', height: '40px', fontSize: '1rem' }}>
+                  {getInitials(selectedStudentForModal.name)}
+                </div>
+                <div>
+                  <h3 style={{ margin: 0 }}>{selectedStudentForModal.name}</h3>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Roll: {selectedStudentForModal.rollNo || '-'} &bull; {selectedStudentForModal.email}
+                  </div>
+                </div>
+              </div>
+              <button
+                className="btn btn-ghost"
+                style={{ borderRadius: '50%', padding: '0.5rem' }}
+                onClick={() => setSelectedStudentForModal(null)}
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+              {[
+                { label: 'Total Classes', val: selectedStudentForModal.total, color: 'var(--primary)' },
+                { label: 'Present', val: selectedStudentForModal.present, color: 'var(--success)' },
+                { label: 'Absent', val: selectedStudentForModal.total - selectedStudentForModal.present, color: 'var(--danger)' },
+                { label: 'Rate', val: `${selectedStudentForModal.rate}%`, color: selectedStudentForModal.rate >= 75 ? 'var(--success)' : selectedStudentForModal.rate >= 50 ? 'var(--warning)' : 'var(--danger)' },
+              ].map(s => (
+                <div key={s.label} className="glass-panel" style={{ padding: '0.85rem 1.2rem', flex: '1 1 100px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: s.color }}>{s.val}</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '0.2rem' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="table-container">
+              <table className="table">
+                <thead><tr><th>Date</th><th>Status</th></tr></thead>
+                <tbody>
+                  {attendanceRecords.map((att, idx) => {
+                    const rec = att.records.find(r => r.student && r.student._id === selectedStudentForModal._id);
+                    const status = rec ? rec.status : 'pending';
+                    return (
+                      <tr key={idx}>
+                        <td>{new Date(att.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                        <td>
+                          <span className={`badge badge-${status === 'present' ? 'success' : status === 'absent' ? 'danger' : 'pending'}`}>
+                            {status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {attendanceRecords.length === 0 && (
+                    <tr>
+                      <td colSpan="2" style={{ textAlign: 'center', padding: '1rem' }}>No records found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      )}
     </>
   );
 };

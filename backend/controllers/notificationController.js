@@ -12,6 +12,21 @@ export const getNotifications = async (req, res) => {
   }
 };
 
+// @desc    Mark all user's notifications as read
+// @route   PUT /api/notifications/read
+// @access  Private
+export const markAllRead = async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { user: req.user.id, isRead: false },
+      { $set: { isRead: true } }
+    );
+    res.json({ message: "Notifications marked as read" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Delete a notification
 // @route   DELETE /api/notifications/:id
 // @access  Private

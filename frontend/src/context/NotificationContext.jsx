@@ -57,7 +57,7 @@ export const NotificationProvider = ({ children }) => {
     try {
       const res = await axios.get('/notifications');
       setNotifications(res.data);
-      setUnreadCount(res.data.length); // simple unread count based on total for now
+      setUnreadCount(res.data.filter(n => !n.isRead).length);
     } catch (error) {
       console.error(error);
     }
@@ -90,19 +90,29 @@ export const NotificationProvider = ({ children }) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const markAllRead = useCallback(() => {
-    setUnreadCount(0);
+  const markAllRead = useCallback(async () => {
+    try {
+      await axios.put('/notifications/read');
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
   const deleteNotification = useCallback(async (id) => {
     try {
       await axios.delete(`/notifications/${id}`);
       setNotifications(prev => prev.filter(n => n._id !== id));
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      // Re-calculate unread count from state
+      setUnreadCount(prevUnread => {
+        const deletedNotif = notifications.find(n => n._id === id);
+        return deletedNotif && !deletedNotif.isRead ? Math.max(0, prevUnread - 1) : prevUnread;
+      });
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [notifications]);
 
   const clearAll = useCallback(async () => {
     // We could add a clearAll API, but for now just clear local state 
