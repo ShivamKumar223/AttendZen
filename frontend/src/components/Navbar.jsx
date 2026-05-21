@@ -105,12 +105,14 @@ const Navbar = () => {
 
           {/* User */}
           <div className="flex items-center gap-3">
-            <div className="avatar" style={{ width: '36px', height: '36px', fontSize: '0.8rem' }}>
-              {getInitials(user?.name)}
-            </div>
-            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-main)' }}>
-              {user?.name?.split(' ')[0]}
-            </span>
+            <Link to="/profile" className="flex items-center gap-3" style={{ textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+              <div className="avatar" style={{ width: '36px', height: '36px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                {getInitials(user?.name)}
+              </div>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-main)', cursor: 'pointer' }}>
+                {user?.name?.split(' ')[0]}
+              </span>
+            </Link>
             <button
               className="btn btn-ghost"
               onClick={handleLogout}

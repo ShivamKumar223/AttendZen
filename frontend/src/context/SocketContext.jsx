@@ -11,8 +11,8 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (user && token) {
       // Connect to Socket.IO server
-      const newSocket = io('http://localhost:5000');
-      // const newSocket = io('https://attendzen.onrender.com');
+      // const newSocket = io('http://localhost:5000');
+      const newSocket = io('https://attendzen.onrender.com'); 
 
       newSocket.on('connect', () => {
         console.log('Connected to socket server');

@@ -7,8 +7,11 @@ import NotificationToast from './components/NotificationToast';
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import ClassDetail from './pages/ClassDetail';
+// import Profile from './pages/Profile';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = React.useContext(AuthContext);
@@ -33,8 +36,11 @@ function AppContent() {
           <Route path="/" element={<Navigate to={user ? '/dashboard' : '/login'} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/class/:id" element={<PrivateRoute><ClassDetail /></PrivateRoute>} />
+          {/* <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} /> */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>

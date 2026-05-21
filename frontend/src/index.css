@@ -735,7 +735,7 @@ p {
   display: flex;
 }
 
-@media (max-width: 415px) {
+@media (max-width: 532px) {
   .flex-res {
     display: flex;
     flex-direction: column;

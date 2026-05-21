@@ -10,6 +10,7 @@ const Signup = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -20,16 +21,24 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
+
     const res = await register(formData.name, formData.email, formData.mobile, formData.password);
+    setLoading(false);
+
     if (res.success) {
-      navigate('/dashboard');
+      if (res.needsVerification) {
+        navigate(`/verify-email?email=${encodeURIComponent(res.email)}`);
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       setError(res.message);
     }
   };
 
   return (
-    <div className="container flex items-center justify-center" style={{ minHeight: '100vh' }}>
+    <div className="container flex items-center justify-center fade-in-up" style={{ minHeight: '100vh' }}>
       <div className="glass-panel card" style={{ maxWidth: '450px', width: '100%' }}>
         <h2 className="heading-gradient mb-4 text-center">Create an Account</h2>
         {error && <div className="badge badge-danger mb-4" style={{ display: 'block', textAlign: 'center' }}>{error}</div>}
@@ -44,6 +53,8 @@ const Signup = () => {
               value={formData.name}
               onChange={handleChange}
               required
+              disabled={loading}
+              placeholder="John Doe"
             />
           </div>
           <div className="form-group">
@@ -55,6 +66,8 @@ const Signup = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              disabled={loading}
+              placeholder="john@example.com"
             />
           </div>
           <div className="form-group">
@@ -66,6 +79,8 @@ const Signup = () => {
               value={formData.mobile}
               onChange={handleChange}
               required
+              disabled={loading}
+              placeholder="1234567890"
             />
           </div>
           <div className="form-group">
@@ -77,13 +92,17 @@ const Signup = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              disabled={loading}
+              placeholder="At least 6 characters"
             />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Sign Up</button>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+            {loading ? 'Creating Account...' : 'Sign Up'}
+          </button>
         </form>
 
-        <p className="text-center mt-4 text-muted">
-          Already have an account? <Link to="/login" style={{ color: 'var(--primary)' }}>Login</Link>
+        <p className="text-center mt-4 text-muted" style={{ fontSize: '0.9rem' }}>
+          Already have an account? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>Login</Link>
         </p>
       </div>
     </div>

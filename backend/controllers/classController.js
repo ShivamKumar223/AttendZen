@@ -1,4 +1,6 @@
 import Class from "../models/Class.js";
+import Attendance from "../models/Attendance.js";
+import JoinRequest from "../models/JoinRequest.js";
 import crypto from "crypto";
 
 // @desc    Create a new class
@@ -80,6 +82,34 @@ export const searchClass = async (req, res) => {
     }
 
     res.json(foundClass);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete a class and all associated data
+// @route   DELETE /api/classes/:classId
+// @access  Private
+export const deleteClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const classDoc = await Class.findById(classId);
+
+    if (!classDoc) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    // Only the teacher can delete the class
+    if (classDoc.teacher.toString() !== req.user.id) {
+      return res.status(401).json({ message: "Not authorized to delete this class" });
+    }
+
+    // Cascading delete to maintain database efficiency
+    await Class.findByIdAndDelete(classId);
+    await Attendance.deleteMany({ class: classId });
+    await JoinRequest.deleteMany({ class: classId });
+
+    res.json({ message: "Class and all associated records deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

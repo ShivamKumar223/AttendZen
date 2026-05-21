@@ -149,27 +149,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {unreadCount > 0 && (
-            <div
-              style={{
-                marginTop: '1rem',
-                padding: '0.6rem 1rem',
-                background: 'rgba(99,102,241,0.15)',
-                border: '1px solid rgba(99,102,241,0.3)',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.6rem',
-                fontSize: '0.85rem',
-                color: '#a5b4fc',
-              }}
-            >
-              <FiBell size={14} />
 
-              You have <strong>{unreadCount}</strong> unread notification
-              {unreadCount > 1 ? 's' : ''} — click the bell above to view.
-            </div>
-          )}
         </div>
 
         {/* SECTION SWITCH BUTTONS */}
