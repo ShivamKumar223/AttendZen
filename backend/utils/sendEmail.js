@@ -33,6 +33,10 @@ export const sendEmail = async ({ to, subject, html, text }) => {
       user: EMAIL_USER,
       pass: EMAIL_PASS,
     },
+    // Prevent long hangs (common cause of slow registration)
+    connectionTimeout: parseInt(process.env.EMAIL_CONNECTION_TIMEOUT_MS || "8000"),
+    greetingTimeout: parseInt(process.env.EMAIL_GREETING_TIMEOUT_MS || "8000"),
+    socketTimeout: parseInt(process.env.EMAIL_SOCKET_TIMEOUT_MS || "8000"),
   });
 
   const mailOptions = {

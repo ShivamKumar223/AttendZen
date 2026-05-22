@@ -64,16 +64,20 @@ export const registerUser = async (req, res) => {
         </div>
       `;
 
-      await sendEmail({
+      // IMPORTANT: don't block registration UX on email delivery.
+      // If SMTP is slow/unreachable, waiting here makes the whole request feel "stuck".
+      sendEmail({
         to: email,
         subject: "✦ Verify your AttendZen Account",
         html: emailHtml,
         text: `Welcome to AttendZen! Please verify your email. Your 6-digit verification code is: ${otp}. It is valid for 10 minutes.`
+      }).catch((e) => {
+        console.error("[registerUser] Email send failed (non-blocking):", e?.message || e);
       });
 
       res.status(201).json({
         success: true,
-        message: "Registration successful. Verification OTP sent to your email.",
+        message: "Registration successful. Verification OTP will be sent to your email.",
         email: user.email,
         needsVerification: true,
       });
@@ -130,11 +134,14 @@ export const loginUser = async (req, res) => {
           </div>
         `;
 
-        await sendEmail({
+        // Don't block login UX if email delivery is slow.
+        sendEmail({
           to: user.email,
           subject: "✦ Verify your AttendZen Account",
           html: emailHtml,
           text: `Your email is not verified. Please verify using this code: ${otp}. It is valid for 10 minutes.`
+        }).catch((e) => {
+          console.error("[loginUser] Email send failed (non-blocking):", e?.message || e);
         });
 
         return res.status(403).json({
@@ -251,11 +258,14 @@ export const resendOtp = async (req, res) => {
       </div>
     `;
 
-    await sendEmail({
+    // Don't block resend OTP UX on email delivery.
+    sendEmail({
       to: email,
       subject: "✦ Resent: Verify your AttendZen Account",
       html: emailHtml,
       text: `Your new 6-digit verification code is: ${otp}. It is valid for 10 minutes.`
+    }).catch((e) => {
+      console.error("[resendOtp] Email send failed (non-blocking):", e?.message || e);
     });
 
     res.json({ success: true, message: "Verification OTP resent successfully." });
@@ -310,12 +320,16 @@ export const forgotPassword = async (req, res) => {
       </div>
     `;
 
-    await sendEmail({
+    // Don't block forgot-password OTP UX on email delivery.
+    sendEmail({
       to: email,
       subject: "✦ Reset your AttendZen Password",
       html: emailHtml,
       text: `You requested a password reset. Your 6-digit OTP code is: ${otp}. It is valid for 10 minutes.`
+    }).catch((e) => {
+      console.error("[forgotPassword] Email send failed (non-blocking):", e?.message || e);
     });
+
 
     res.json({ success: true, message: "Password reset OTP sent to your email." });
   } catch (error) {
