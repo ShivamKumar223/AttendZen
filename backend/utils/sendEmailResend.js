@@ -25,9 +25,9 @@ export const sendEmailResend = async ({ to, subject, html, text }) => {
     RESEND_FROM_NAME,
   } = process.env;
 
-console.log(RESEND_API_KEY);
-console.log(RESEND_FROM_EMAIL);
-console.log(RESEND_FROM_NAME);
+// console.log(RESEND_API_KEY);
+// console.log(RESEND_FROM_EMAIL);
+// console.log(RESEND_FROM_NAME);
 
   const missing = [];
   if (!RESEND_API_KEY) missing.push("RESEND_API_KEY");
@@ -54,6 +54,9 @@ console.log(RESEND_FROM_NAME);
     : RESEND_FROM_EMAIL;
 
   try {
+
+    console.log("TO EMAIL:", to);
+
     await resend.emails.send({
       from,
       to,

@@ -35,9 +35,13 @@ const Navbar = () => {
       <div className="container flex items-center justify-between" style={{ height: '70px' }}>
 
         {/* Logo */}
-        <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-          <h2 className="heading-gradient" style={{ fontSize: '1.4rem', margin: 0 }}>
-            ✦ AttendZen
+        <Link to="/dashboard" style={{ textDecoration: 'none'}}>
+          <h2 className="heading-gradient" style={{ fontSize: '1.4rem', margin: 0, display:'flex', alignItems:'center' }}>
+          <img 
+         src="/logo.png" 
+         alt="Profile Photo" 
+         width="60" 
+        /> AttendZen
           </h2>
         </Link>
 
