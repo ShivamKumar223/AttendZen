@@ -19,7 +19,7 @@ DBconnection(); // 🔥 Atlas connection
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://smart-attendzen.netlify.app/'],
+  origin: ['http://localhost:5173', 'https://smart-attendzen.netlify.app'],
   credentials: true
 }));
 
