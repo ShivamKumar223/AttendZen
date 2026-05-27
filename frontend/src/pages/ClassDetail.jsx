@@ -6,13 +6,15 @@ import { NotificationContext } from '../context/NotificationContext';
 import Navbar from '../components/Navbar';
 import {
   FiArrowLeft, FiCheck, FiX, FiUsers, FiCalendar,
-  FiClock, FiTrash2, FiAlertTriangle, FiMail, FiUser
+  FiClock, FiTrash2, FiAlertTriangle, FiMail, FiUser, FiMessageSquare
 } from 'react-icons/fi';
+
+import ClassChat from '../components/ClassChat/ClassChat';
 
 const getInitials = (name = '') =>
   name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
-const TABS = ['Requests', 'Enrolled', 'Attendance', 'History'];
+const TABS = ['Attendance', 'Chat' ,'Enrolled', 'Requests', 'History', ];
 
 /* ── Utility: attendance colour ──────────────────────────────────────────── */
 const rateColor = (rate) =>
@@ -34,7 +36,7 @@ const ClassDetail = () => {
   const [studentAttendance, setStudentAttendance] = useState([]);
   const [attendanceState, setAttendanceState] = useState({});
   const [isConfirming, setIsConfirming] = useState(false);
-  const [activeTab, setActiveTab] = useState('Requests');
+  const [activeTab, setActiveTab] = useState('Attendance');
 
   /* ── student detail modal ── */
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -558,6 +560,13 @@ const ClassDetail = () => {
                     </table>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ── Tab: Chat ── */}
+            {activeTab === 'Chat' && (
+              <div style={{ marginTop: '1rem' }}>
+                <ClassChat classId={id} />
               </div>
             )}
           </>

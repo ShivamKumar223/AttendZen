@@ -29,7 +29,7 @@ const Login = () => {
 
   return (
     <div className="container flex items-center justify-center fade-in-up" style={{ minHeight: '100vh' }}>
-      <div className="glass-panel card" style={{ maxWidth: '400px', width: '100%' }}>
+      <div className="glass-panel card " style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="heading-gradient mb-4 text-center">Welcome Back</h2>
         {error && <div className="badge badge-danger mb-4" style={{ display: 'block', textAlign: 'center' }}>{error}</div>}
 
@@ -74,6 +74,8 @@ const Login = () => {
           Don't have an account? <Link to="/signup" style={{ color: 'var(--primary)', fontWeight: 600 }}>Sign Up</Link>
         </p>
       </div>
+
+
     </div>
   );
 };

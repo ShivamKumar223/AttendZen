@@ -1,0 +1,5 @@
+/* Chat UI styles kept minimal; mostly inline for now to fit current project patterns. */
+
+.chat-file{
+    display : none;
+}

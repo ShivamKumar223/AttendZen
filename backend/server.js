@@ -1,5 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -13,8 +16,10 @@ import classRoutes from "./routers/classRoutes.js";
 import requestRoutes from "./routers/requestRoutes.js";
 import attendanceRoutes from "./routers/attendanceRoutes.js";
 import notificationRoutes from "./routers/notificationRoutes.js";
+import chatRoutes from "./routers/chatRoutes.js";
 
 dotenv.config();
+
 DBconnection(); // 🔥 Atlas connection
 
 const app = express();
@@ -62,12 +67,24 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve uploaded media (images/pdfs) for chat
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
+
+
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/chat", chatRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
