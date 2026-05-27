@@ -2,11 +2,14 @@ import React, { useEffect, useMemo, useRef, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { NotificationContext } from '../../context/NotificationContext';
+import { SocketContext } from '../../context/SocketContext';
 
 import "./chat.css";
 import { IoDocumentAttachOutline } from "react-icons/io5";
 // Simple WhatsApp-like chat UI.
-// Uses REST (scalable, works with/without socket). Can be upgraded later to full socket streaming.
+// Uses REST for initial load; also uses Socket.IO for realtime new/delete message updates.
+
+
 
 const timeAgo = (date) => {
   const diff = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -31,8 +34,10 @@ const isWithinDeleteWindow = (createdAt) => {
 const ClassChat = ({ classId }) => {
   const { user } = useContext(AuthContext);
   const { addNotification } = useContext(NotificationContext);
+  const socket = useContext(SocketContext);
 
   const [group, setGroup] = useState(null);
+
   const groupId = group?._id;
 
   const [messages, setMessages] = useState([]);
@@ -86,16 +91,58 @@ const ClassChat = ({ classId }) => {
     fetchMessages();
   }, [groupId, addNotification]);
 
+  // Keep blocked list synced
   useEffect(() => {
     if (!group) return;
     setBlockedSet(new Set(group.blockedStudents || []));
   }, [group]);
+
+  // Realtime updates (new-message / delete-message)
+  useEffect(() => {
+    if (!socket || !groupId || !user) return;
+
+    const joinRooms = () => {
+      socket.emit('join-class-room', classId);
+      socket.emit('join-class-room', groupId);
+    };
+
+    // Join rooms immediately
+    joinRooms();
+
+    // Rejoin rooms on reconnect
+    socket.on('connect', joinRooms);
+
+    const onNewMessage = (msg) => {
+      if (!msg || !msg._id) return;
+      setMessages((prev) => {
+        const exists = prev.some((m) => m._id === msg._id);
+        if (exists) return prev;
+        return [msg, ...prev].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      });
+    };
+
+    const onDeleteMessage = (messageId) => {
+      if (!messageId) return;
+      setMessages((prev) => prev.filter((m) => m._id !== messageId));
+    };
+
+    socket.on('new-message', onNewMessage);
+    socket.on('delete-message', onDeleteMessage);
+
+    return () => {
+      socket.off('connect', joinRooms);
+      socket.off('new-message', onNewMessage);
+      socket.off('delete-message', onDeleteMessage);
+    };
+  }, [socket, groupId, classId, user]);
+
 
   useEffect(() => {
     // Scroll to bottom when messages change
     if (!listRef.current) return;
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages.length]);
+
 
   const refreshGroup = async () => {
     try {
@@ -108,6 +155,7 @@ const ClassChat = ({ classId }) => {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const onPickFile = (f) => {
     if (!f) {
       setFile(null);
@@ -162,6 +210,7 @@ const ClassChat = ({ classId }) => {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleDelete = async (messageId) => {
     if (!groupId) return;
     try {
@@ -180,10 +229,6 @@ const ClassChat = ({ classId }) => {
 
   const [selectedStudentToBlock, setSelectedStudentToBlock] = useState('');
 
-  // Note: we don't have students list in this component.
-  // We'll block by entering studentId manually (server expects studentId).
-  // In next iteration we can pass classData.students.
-
   const handleBlock = async () => {
     if (!isTeacher) {
       addNotification('Only teacher can block', 'error');
@@ -193,9 +238,16 @@ const ClassChat = ({ classId }) => {
       addNotification('Select studentId', 'error');
       return;
     }
+    const normalizedId = selectedStudentToBlock.trim();
+    if (!normalizedId) {
+      addNotification('Select valid studentId', 'error');
+      return;
+    }
+
     try {
-      await axios.post(`/chat/groups/${groupId}/block`, { studentId: selectedStudentToBlock });
+      await axios.post(`/chat/groups/${groupId}/block`, { studentId: normalizedId });
       await refreshGroup();
+      setSelectedStudentToBlock('');
       addNotification('Student blocked', 'success');
     } catch (e) {
       console.error(e);
@@ -257,6 +309,7 @@ const ClassChat = ({ classId }) => {
               .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
               .map((m) => {
                 const mine = m.sender?.toString?.() === user?._id?.toString?.() || m.sender === user?._id;
+                // eslint-disable-next-line no-unused-vars
                 const canDelete = mine && isWithinDeleteWindow(m.createdAt);
 
                 return (

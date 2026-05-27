@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
@@ -37,7 +38,7 @@ function playTone(type = 'info') {
 
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.5);
-  } catch (e) {
+  } catch {
     // Audio blocked or not supported — silently ignore
   }
 }
@@ -64,7 +65,9 @@ export const NotificationProvider = ({ children }) => {
   }, [user]);
 
   useEffect(() => {
-    fetchNotifications();
+    setTimeout(() => {
+      fetchNotifications();
+    }, 0);
   }, [fetchNotifications]);
 
   const addToast = useCallback((message, type = 'info') => {

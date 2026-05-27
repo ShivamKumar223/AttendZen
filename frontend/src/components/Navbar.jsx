@@ -24,6 +24,7 @@ const Navbar = () => {
   };
 
   const timeLabel = (date) => {
+    // eslint-disable-next-line react-hooks/purity
     const diff = Math.floor((Date.now() - new Date(date)) / 1000);
     if (diff < 60) return 'just now';
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;

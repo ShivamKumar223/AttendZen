@@ -27,14 +27,16 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
-      setForm(f => ({
-        ...f,
-        name: user.name || '',
-        email: user.email || '',
-        mobile: user.mobile || '',
-        password: '',
-        confirmPassword: '',
-      }));
+      setTimeout(() => {
+        setForm(f => ({
+          ...f,
+          name: user.name || '',
+          email: user.email || '',
+          mobile: user.mobile || '',
+          password: '',
+          confirmPassword: '',
+        }));
+      }, 0);
     }
   }, [user]);
 

@@ -23,7 +23,7 @@ export const T_header = () => {
   )
 }
 
-const TeacherMenu = ({ toggle, setToggle }) => {
+const TeacherMenu = ({ toggle }) => {
 
   return (
     <ul className={`menu-list ${toggle ? "hide-menu" : "show-menu"}`}>

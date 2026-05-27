@@ -32,7 +32,7 @@ const ForgotPassword = () => {
         setTimer(prev => prev - 1);
       }, 1000);
     } else if (step === 2 && timer === 0) {
-      setCanResend(true);
+      setTimeout(() => setCanResend(true), 0);
       if (interval) clearInterval(interval);
     }
     return () => clearInterval(interval);

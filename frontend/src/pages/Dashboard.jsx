@@ -8,7 +8,7 @@ import { FiPlus, FiLogIn, FiBell } from 'react-icons/fi';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
-  const { unreadCount, addNotification } = useContext(NotificationContext);
+  const { addNotification } = useContext(NotificationContext);
 
   const [teachingClasses, setTeachingClasses] = useState([]);
   const [enrolledClasses, setEnrolledClasses] = useState([]);

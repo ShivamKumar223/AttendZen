@@ -7,7 +7,6 @@ import { FiMail, FiCheckCircle, FiShield, FiRefreshCw, FiArrowLeft } from 'react
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email') || '';
-  const fromLogin = searchParams.get('fromLogin') === 'true';
 
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
@@ -39,7 +38,7 @@ const VerifyEmail = () => {
         setTimer(prev => prev - 1);
       }, 1000);
     } else {
-      setCanResend(true);
+      setTimeout(() => setCanResend(true), 0);
       if (interval) clearInterval(interval);
     }
     return () => clearInterval(interval);

@@ -1,5 +1,12 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+
+// Dynamic API URL for easy local testing & seamless production fallback
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+axios.defaults.baseURL = isLocalhost 
+  ? 'http://localhost:5000/api' 
+  : 'https://attendzen.onrender.com/api';
 
 export const AuthContext = createContext();
 
@@ -8,22 +15,21 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
-  // Dynamic API URL for easy local testing & seamless production fallback
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  axios.defaults.baseURL = isLocalhost 
-    ? 'http://localhost:5000/api' 
-    : 'https://attendzen.onrender.com/api';
-
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const savedUser = localStorage.getItem('user');
-      if (savedUser) setUser(JSON.parse(savedUser));
+      setTimeout(() => {
+        if (savedUser) setUser(JSON.parse(savedUser));
+        setLoading(false);
+      }, 0);
     } else {
       delete axios.defaults.headers.common['Authorization'];
-      setUser(null);
+      setTimeout(() => {
+        setUser(null);
+        setLoading(false);
+      }, 0);
     }
-    setLoading(false);
   }, [token]);
 
   const login = async (email, password) => {

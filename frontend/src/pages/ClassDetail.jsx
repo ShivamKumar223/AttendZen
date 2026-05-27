@@ -15,6 +15,7 @@ const getInitials = (name = '') =>
   name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
 const TABS = ['Attendance', 'Chat' ,'Enrolled', 'Requests', 'History', ];
+const STUDENT_TABS = ['Attendance', 'Chat'];
 
 /* ── Utility: attendance colour ──────────────────────────────────────────── */
 const rateColor = (rate) =>
@@ -79,15 +80,15 @@ const ClassDetail = () => {
   };
 
   const fetchRequests = async () => {
-    try { const res = await axios.get(`/requests/${id}`); setRequests(res.data); } catch { }
+    try { const res = await axios.get(`/requests/${id}`); setRequests(res.data); } catch (err) { console.error(err); }
   };
 
   const fetchAttendanceHistory = async () => {
-    try { const res = await axios.get(`/attendance/class/${id}`); setAttendanceRecords(res.data); } catch { }
+    try { const res = await axios.get(`/attendance/class/${id}`); setAttendanceRecords(res.data); } catch (err) { console.error(err); }
   };
 
   const fetchStudentAttendance = async () => {
-    try { const res = await axios.get(`/attendance/student/${id}`); setStudentAttendance(res.data); } catch { }
+    try { const res = await axios.get(`/attendance/student/${id}`); setStudentAttendance(res.data); } catch (err) { console.error(err); }
   };
 
   /* ── request actions ── */
@@ -569,58 +570,82 @@ const ClassDetail = () => {
                 <ClassChat classId={id} />
               </div>
             )}
+
           </>
         ) : (
           /* ── STUDENT VIEW ────────────────────────────────────────────── */
-          <div className="glass-panel card fade-in-up">
-            <h3 style={{ marginBottom: '1.25rem' }}>📊 My Attendance</h3>
-            {studentAttendance.length === 0 ? (
-              <div className="empty-state" style={{ padding: '2rem' }}>
-                <div className="empty-state-icon">📋</div>
-                <p>No attendance records yet.</p>
-              </div>
-            ) : (
-              <>
-                {(() => {
-                  const present = studentAttendance.filter(r => r.status === 'present').length;
-                  const tot = studentAttendance.length;
-                  const pct = tot ? Math.round((present / tot) * 100) : 0;
-                  return (
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-                      {[
-                        { label: 'Total Classes', val: tot, color: 'var(--primary)' },
-                        { label: 'Present', val: present, color: 'var(--success)' },
-                        { label: 'Absent', val: tot - present, color: 'var(--danger)' },
-                        { label: 'Attendance %', val: `${pct}%`, color: rateColor(pct) },
-                      ].map(s => (
-                        <div key={s.label} className="glass-panel" style={{ padding: '0.85rem 1.2rem', flex: '1 1 100px', textAlign: 'center' }}>
-                          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: s.color }}>{s.val}</div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '0.2rem' }}>{s.label}</div>
+          <>
+            {/* Tab bar */}
+            <div className="tab-bar">
+              {STUDENT_TABS.map(tab => (
+                <button
+                  key={tab}
+                  className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab === 'Attendance' ? 'My Attendance' : tab}
+                </button>
+              ))}
+            </div>
+
+            {activeTab === 'Attendance' && (
+              <div className="glass-panel card fade-in-up">
+                <h3 style={{ marginBottom: '1.25rem' }}>📊 My Attendance</h3>
+                {studentAttendance.length === 0 ? (
+                  <div className="empty-state" style={{ padding: '2rem' }}>
+                    <div className="empty-state-icon">📋</div>
+                    <p>No attendance records yet.</p>
+                  </div>
+                ) : (
+                  <>
+                    {(() => {
+                      const present = studentAttendance.filter(r => r.status === 'present').length;
+                      const tot = studentAttendance.length;
+                      const pct = tot ? Math.round((present / tot) * 100) : 0;
+                      return (
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+                          {[
+                            { label: 'Total Classes', val: tot, color: 'var(--primary)' },
+                            { label: 'Present', val: present, color: 'var(--success)' },
+                            { label: 'Absent', val: tot - present, color: 'var(--danger)' },
+                            { label: 'Attendance %', val: `${pct}%`, color: rateColor(pct) },
+                          ].map(s => (
+                            <div key={s.label} className="glass-panel" style={{ padding: '0.85rem 1.2rem', flex: '1 1 100px', textAlign: 'center' }}>
+                              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: s.color }}>{s.val}</div>
+                              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '0.2rem' }}>{s.label}</div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      );
+                    })()}
+                    <div className="table-container">
+                      <table className="table">
+                        <thead><tr><th>Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                          {studentAttendance.map((record, index) => (
+                            <tr key={index}>
+                              <td>{new Date(record.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                              <td>
+                                <span className={`badge badge-${record.status === 'present' ? 'success' : record.status === 'absent' ? 'danger' : 'pending'}`}>
+                                  {record.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  );
-                })()}
-                <div className="table-container">
-                  <table className="table">
-                    <thead><tr><th>Date</th><th>Status</th></tr></thead>
-                    <tbody>
-                      {studentAttendance.map((record, index) => (
-                        <tr key={index}>
-                          <td>{new Date(record.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                          <td>
-                            <span className={`badge badge-${record.status === 'present' ? 'success' : record.status === 'absent' ? 'danger' : 'pending'}`}>
-                              {record.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
+                  </>
+                )}
+              </div>
             )}
-          </div>
+
+            {activeTab === 'Chat' && (
+              <div style={{ marginTop: '1rem' }}>
+                <ClassChat classId={id} />
+              </div>
+            )}
+          </>
         )}
       </div>
 
